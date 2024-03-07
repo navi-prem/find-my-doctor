@@ -4,23 +4,29 @@ import { Admin } from "../queries"
 import bcrypt from "bcryptjs"
 
 export const signIn = async (req: Request, res: Response) => {
+    let status = 401
+    let msg = "Admin not authorized."
     const { uid, pass } = req.body
-    if (!uid || !pass) return res.status(401).send("Admin not authorized.")
+    if (uid === undefined || pass === undefined) return res.status(status).send(msg)
 
     const client = await pool.connect()
 
     try {
         const { rows } = await client.query(Admin.getAdmin, [uid])
-        client.release()
 
         if (await bcrypt.compare(pass, rows[0].pass)) {
             // Sign In Logic goes here ... Tbd later on
-            return res.status(200).send("Admin signed in successfully")
-        } else return res.status(401).send("Admin not authorized.")
+            status = 200
+            msg = "Admin signed in successfully"
+        }
     } catch (err) {
+        console.log(err)
+        status = 500
+        msg = "Internal Server Error."
+    } finally {
         client.release()
-        return res.status(500).send("Internal Server Error.")
-    } 
+        return res.status(status).send(msg)
+    }
 }
 
 export const createAdmin = async (req: Request, res: Response) => {

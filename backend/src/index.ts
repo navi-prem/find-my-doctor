@@ -5,7 +5,7 @@ import { Admin, Doctor } from "./routes"
 dotenv.config()
 
 const app: Express = express()
-// const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000
 
 app.use(express.json())
 
@@ -16,8 +16,8 @@ app.get("/gg", (_, res: Response) => {
     res.send("Yahallo !!!")
 })
 
-// app.listen(port, () => {
-//    console.log(`[server]: http://localhost:${port}`)
-// })
+app.listen(port, () => {
+   console.log(`[server]: http://localhost:${port}`)
+})
 
 export default app
