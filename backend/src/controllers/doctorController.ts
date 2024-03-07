@@ -53,6 +53,7 @@ export const filter = async (req: Request, res: Response) => {
             return distInKms <= parseFloat(dist)
         })
     } catch (err) {
+        console.log(err)
         client.release()
         return res.send("Internal Server Error.").status(500)
     }
