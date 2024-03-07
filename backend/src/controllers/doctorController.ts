@@ -54,7 +54,7 @@ export const filter = async (req: Request, res: Response) => {
         })
         if (rows.length === 0) {
             client.release()
-            return res.send("No nearby hospitals").status(404).json([])
+            return res.status(404).send([])
         }
     } catch (err) {
         console.log(err)
