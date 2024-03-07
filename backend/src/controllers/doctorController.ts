@@ -52,6 +52,10 @@ export const filter = async (req: Request, res: Response) => {
             if (distInKms <= parseFloat(dist)) hospitalIds = [...hospitalIds, h.hospital_id]
             return distInKms <= parseFloat(dist)
         })
+        if (rows.length === 0) {
+            client.release()
+            return res.send("No nearby hospitals").status(404)
+        }
     } catch (err) {
         console.log(err)
         client.release()
