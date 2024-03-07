@@ -54,7 +54,7 @@ export const filter = async (req: Request, res: Response) => {
         })
         if (rows.length === 0) {
             client.release()
-            return res.status(404).send([])
+            return res.send([]).status(404)
         }
     } catch (err) {
         console.log(err)
