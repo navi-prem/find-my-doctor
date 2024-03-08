@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { pool } from "../../db/db"
 import { Admin } from "../queries"
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 
 export const signIn = async (req: Request, res: Response) => {
     let status = 401
@@ -12,10 +13,13 @@ export const signIn = async (req: Request, res: Response) => {
     const client = await pool.connect()
 
     try {
-        const { rows } = await client.query(Admin.getAdmin, [uid])
+        const { rows } = await client.query(Admin.getAdmin, [uid.toString()])
+        if (rows.length === 0) return res.status(404).send("NO USER FOUND.")
 
-        if (await bcrypt.compare(pass, rows[0].pass)) {
-            // Sign In Logic goes here ... Tbd later on
+        if (await bcrypt.compare(pass.toString(), rows[0].pass)) {
+            const token = jwt.sign({ uid: rows[0].uid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
+            console.log(token)
+            res.cookie("access_token", token, { httpOnly: true, maxAge: 86400000 })
             status = 200
             msg = "Admin signed in successfully"
         }
@@ -36,9 +40,10 @@ export const createAdmin = async (req: Request, res: Response) => {
     const client = await pool.connect()
 
     try {
-        const hash = await bcrypt.hash(pass, 10)
-        await client.query(Admin.createAdmin, [uid, hash])
+        const hash = await bcrypt.hash(pass.toString(), 10)
+        await client.query(Admin.createAdmin, [uid.toString(), hash])
         client.release()
+        console.log(2)
 
     } catch (err) {
         console.log(err)

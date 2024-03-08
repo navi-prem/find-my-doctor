@@ -69,9 +69,10 @@ export const filter = async (req: Request, res: Response) => {
         const { data } = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destinations}&origins=${encodeURIComponent(latitude + ',' + longitude)}&key=${process.env.API_KEY}`)
         const arr = data.rows[0].elements.map((e: any) => e.status === 'OK' ? e.duration.text : '-1 mins')
         doctors = doctors.map((x, i) => ({ ...x, time: timeToMinutes(arr[i]) }))
-
+        const doctorIds = new Set()
+        doctors.forEach((e) => doctorIds.add(e.doctor_id))
+        console.log([...doctorIds])
         const model_url = process.env.MODEL_URL || ""
-        console.log(`${model_url}/api/cimta`)
         const { data: d } = await axios.post(`${model_url}/api/cimta`, { data: doctors })
 
         status = 200
