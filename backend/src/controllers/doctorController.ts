@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response } from "express"
 import { pool } from "../../db/db"
 import { Doctor } from "../queries"
@@ -71,7 +72,25 @@ export const filter = async (req: Request, res: Response) => {
         doctors = doctors.map((x, i) => ({ ...x, time: timeToMinutes(arr[i]) }))
         const doctorIds = new Set()
         doctors.forEach((e) => doctorIds.add(e.doctor_id))
-        console.log([...doctorIds])
+        const ids = [...doctorIds]
+        const { rows } = await client.query(Doctor.getCountData, [ids])
+        const main = {}
+        for (let x of ids) {
+            main[x] = new Array(7).fill(0)
+        }
+        rows.forEach((row) => {
+            main[row.doctor_id][6 - row.time_interval] = row.patient_count
+        })
+        for (let x in main) {
+            let c = 0
+            for (let i = main[x].length - 1 ; i > -1 ; i --) {
+                let t = main[x][i]
+                main[x][i] = main[x][i] - c
+                c = t
+            }
+            console.log(x, main[x])
+        }
+        doctors = doctors.map((doc) => ({...doc, crowd: main[doc.doctor_id]}))
         const model_url = process.env.MODEL_URL || ""
         const { data: d } = await axios.post(`${model_url}/api/cimta`, { data: doctors })
 
