@@ -70,7 +70,9 @@ export const filter = async (req: Request, res: Response) => {
         const arr = data.rows[0].elements.map((e: any) => e.status === 'OK' ? e.duration.text : '-1 mins')
         doctors = doctors.map((x, i) => ({ ...x, time: timeToMinutes(arr[i]) }))
 
-        const { data: d } = await axios.post('https://test-server-at1i6fz6k-naveen-m-ps-projects.vercel.app/api/cimta', { data: doctors })
+        const model_url = process.env.MODEL_URL || ""
+        console.log(`${model_url}/api/cimta`)
+        const { data: d } = await axios.post(`${model_url}/api/cimta`, { data: doctors })
 
         status = 200
         msg = d
