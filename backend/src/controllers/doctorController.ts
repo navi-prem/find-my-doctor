@@ -36,7 +36,7 @@ function timeToMinutes(timeString: string) {
 
 export const filter = async (req: Request, res: Response) => {
     let status = 400
-    let msg: string | any[] = "Invalid params."
+    let msg: any = "Invalid params."
     const { latitude, longitude, dist } = req.body
     if (latitude === undefined || longitude === undefined || dist === undefined) return res.send(msg).status(status)
 
@@ -70,13 +70,16 @@ export const filter = async (req: Request, res: Response) => {
         const arr = data.rows[0].elements.map((e: any) => e.status === 'OK' ? e.duration.text : '-1 mins')
         doctors = doctors.map((x, i) => ({ ...x, time: timeToMinutes(arr[i]) }))
 
+        const { data: d } = await axios.post('https://test-server-at1i6fz6k-naveen-m-ps-projects.vercel.app/api/cimta', { data: doctors })
+
         status = 200
-        msg = doctors
+        msg = d
     } catch (err) {
+        msg = err
         console.log(err)
     } finally {
         client.release()
         if (status === 200) return res.json(msg).status(status)
-        return res.send("Internal Server Error.").status(500)
+        return res.send(msg).status(500)
     }
 }
