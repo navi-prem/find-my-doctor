@@ -23,6 +23,12 @@ export const generatePatient = async (req: Request, res: Response) => {
     } 
 }
 
+export const getPatients = () => {
+}
+
+export const markConsulted = () => {
+}
+
 export const refresh = async (req: Request, res: Response) => {
     const { doctorId } = req.body
     const client = await pool.connect()
