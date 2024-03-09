@@ -9,15 +9,13 @@ dotenv.config()
 const app: Express = express()
 const port = process.env.PORT || 3000
 
-const allowedOrigins = [
-  "*",
-];
+const allowedOrigins = "*";
 
 const corsOptions = {
   origin: allowedOrigins,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));

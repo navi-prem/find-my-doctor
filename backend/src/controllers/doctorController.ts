@@ -9,12 +9,13 @@ dotenv.config()
 
 export const generatePatient = async (req: Request, res: Response) => {
     const client = await pool.connect()
+    const { doctorId } = req.body
+    if (!doctorId) return res.status(500).send("Invalid Params.")
     try {
-        const data = await client.query(Doctor.generatePatient, [req.body.doctorId, new Date(Date.now())])
+        const { rows } = await client.query(Doctor.generatePatient, [doctorId, new Date(Date.now())])
         client.release()
-        axios.post(process.env.THIS_URL || "", { doctorId })
-        console.log(data)
-        return res.json(data).status(200)
+        axios.post(`${process.env.THIS_URL || ""}/doctor/refresh`, { doctorId })
+        return res.json(rows[0]).status(200)
     } catch (err) {
         console.log(err)
         client.release()
