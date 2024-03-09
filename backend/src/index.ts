@@ -9,7 +9,19 @@ dotenv.config()
 const app: Express = express()
 const port = process.env.PORT || 3000
 
-app.use(cors())
+const allowedOrigins = [
+  "http://localhost:3000",
+];
+
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json())
 app.use(cookieParser())
 
