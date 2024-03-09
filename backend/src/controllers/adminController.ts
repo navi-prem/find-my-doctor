@@ -17,7 +17,8 @@ export const signIn = async (req: Request, res: Response) => {
         if (rows.length === 0) return res.status(404).send("NO USER FOUND.")
 
         if (await bcrypt.compare(pass.toString(), rows[0].pass)) {
-            const token = jwt.sign({ uid: rows[0].uid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
+            delete rows[0].pass
+            const token = jwt.sign({ user: rows[0] }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
             console.log(token)
             res.cookie("access_token", token, { httpOnly: true, maxAge: 86400000 })
             status = 200

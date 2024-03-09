@@ -10,11 +10,28 @@ dotenv.config()
 export const generatePatient = async (req: Request, res: Response) => {
     const client = await pool.connect()
     try {
-        const data = await client.query(Doctor.generatePatient, [req.params.doctorId, new Date(Date.now())])
-        console.log(data)
+        const data = await client.query(Doctor.generatePatient, [req.body.doctorId, new Date(Date.now())])
         client.release()
+        axios.post(process.env.THIS_URL || "", { doctorId })
+        console.log(data)
+        return res.json(data).status(200)
+    } catch (err) {
+        console.log(err)
+        client.release()
+        return res.json(err).status(500)
+    } 
+}
+
+export const refresh = async (req: Request, res: Response) => {
+    const { doctorId } = req.body
+    const client = await pool.connect()
+    try {
+        await client.query(Doctor.updateToken, [doctorId])
+        client.release()
+        return res.status(200).send("Successful")
     } catch (err) {
         client.release()
+        return res.send(msg).status(400)
     }
 }
 
